@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f2ef" />
+    <title>Julia — Profile Photo</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .photo-view-page {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 32px 20px;
+        text-align: center;
+      }
+
+      .photo-view-content {
+        display: grid;
+        justify-items: center;
+        gap: 24px;
+      }
+
+      .profile-photo-large {
+        display: block;
+        width: min(72vw, 560px);
+        aspect-ratio: 1;
+        border: 2px solid var(--line);
+        border-radius: 50%;
+        box-shadow: 0 24px 80px rgb(105 65 75 / 18%);
+        object-fit: cover;
+      }
+
+      .photo-view-back {
+        padding: 12px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text);
+        font-family: "Playfair Display", Georgia, serif;
+        font-size: 14px;
+      }
+
+      .photo-view-back:hover,
+      .photo-view-back:focus-visible {
+        border-color: var(--accent);
+      }
+    </style>
+  </head>
+  <body class="photo-view-page">
+    <main class="photo-view-content">
+      <img
+        class="profile-photo-large"
+        src="image/profile-picture.png"
+        alt="Julia's profile photo"
+      />
+      <a class="photo-view-back" href="index.html#home">Back to portfolio</a>
+    </main>
+  </body>
+</html>
