@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdiDeliver – Admin Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      position: relative;
+    }
+    button.logout {
+      position: absolute;
+      right: 15px;
+      top: 12px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    #map {
+      height: 300px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    img.id-preview {
+      width: 80px;
+      height: auto;
+      border-radius: 5px;
+    }
+    select {
+      padding: 6px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    button.view {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.view:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    🧾 EdiDeliver – Admin Dashboard
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="container">
+    <h2>📦 Bookings Overview</h2>
+
+    <label>Filter by Status:</label>
+    <select id="filter" onchange="loadBookings()">
+      <option value="all">All</option>
+      <option value="Pending">Pending</option>
+      <option value="Accepted">Accepted</option>
+    </select>
+
+    <table id="bookingTable">
+      <thead>
+        <tr>
+          <th>Sender</th>
+          <th>Receiver</th>
+          <th>Pickup</th>
+          <th>Drop-off</th>
+          <th>Status</th>
+          <th>Weight</th>
+          <th>Payment</th>
+          <th>Map</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="map"></div>
+
+    <h2>👥 Registered Users</h2>
+    <table id="userTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Number</th>
+          <th>ID / License</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 🔐 Session check
+    const adminUser = JSON.parse(localStorage.getItem("loggedUser"));
+    if (!adminUser) window.location.href = "login.html";
+
+    // 🗺️ Initialize Leaflet map
+    const map = L.map('map').setView([14.5995, 120.9842], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let markers = [];
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    // 🔄 Load bookings
+    function loadBookings() {
+      const filter = document.getElementById("filter").value;
+      const tbody = document.querySelector("#bookingTable tbody");
+      tbody.innerHTML = "";
+
+      bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+      bookings.forEach((b, i) => {
+        if (filter === "all" || b.status === filter) {
+          const row = `
+            <tr>
+              <td>${b.sender}</td>
+              <td>${b.receiver}</td>
+              <td>${b.pickup}</td>
+              <td>${b.dropoff}</td>
+              <td>${b.status}</td>
+              <td>${b.weight}</td>
+              <td>${b.payment}</td>
+              <td><button class="view" onclick="showMap(${i})">View</button></td>
+            </tr>`;
+          tbody.innerHTML += row;
+        }
+      });
+    }
+
+    loadBookings();
+
+    // 🗺️ Show map markers
+    function showMap(index) {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      const b = bookings[index];
+
+      if (b.pickupCoords && b.dropCoords) {
+        const pickup = L.marker(b.pickupCoords).addTo(map).bindPopup("Pickup: " + b.pickup);
+        const dropoff = L.marker(b.dropCoords).addTo(map).bindPopup("Drop-off: " + b.dropoff);
+        markers.push(pickup, dropoff);
+
+        const routeLine = L.polyline([b.pickupCoords, b.dropCoords], { color: 'blue' }).addTo(map);
+        markers.push(routeLine);
+
+        map.fitBounds(L.featureGroup([pickup, dropoff]).getBounds().pad(0.3));
+      } else {
+        alert("⚠️ No coordinates found for this booking.");
+      }
+    }
+
+    // 👥 Show registered users with ID/license
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const userBody = document.querySelector("#userTable tbody");
+
+    users.forEach(u => {
+      const row = `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>${u.role}</td>
+          <td>${u.number || "-"}</td>
+          <td>${u.idImage ? `<img src="${u.idImage}" class="id-preview">` : "No ID"}</td>
+        </tr>`;
+      userBody.innerHTML += row;
+    });
+
+    // 🚪 Logout function
+    function logout() {
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("rememberUser");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

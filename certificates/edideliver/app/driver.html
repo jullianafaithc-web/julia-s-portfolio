@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdiDeliver – Driver Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      position: relative;
+    }
+    button.logout {
+      position: absolute;
+      right: 15px;
+      top: 12px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    #map {
+      height: 300px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    button.action {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.action:hover {
+      background: #218838;
+    }
+    h3 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    🚛 EdiDeliver – Driver Dashboard
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="container">
+    <h2>📦 Deliveries</h2>
+    <table id="deliveryTable">
+      <thead>
+        <tr>
+          <th>Sender</th>
+          <th>Receiver</th>
+          <th>Pickup</th>
+          <th>Drop-off</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="map"></div>
+
+    <h3 id="driverStats"></h3>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 🔐 Session check
+    const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
+    if (!loggedUser) window.location.href = "login.html";
+
+    // 🗺️ Initialize map
+    const map = L.map('map').setView([14.5995, 120.9842], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let deliveries = JSON.parse(localStorage.getItem("bookings")) || [];
+    const tbody = document.querySelector("#deliveryTable tbody");
+    let markers = [];
+    let routeLine = null;
+
+    // Display both Pending and Accepted deliveries
+    deliveries.forEach((b, i) => {
+      const actionBtn = b.status === "Pending"
+        ? `<button class="action" onclick="acceptDelivery(${i})">Accept</button>`
+        : `<button class="action" onclick="viewRoute(${i})">View Route</button>`;
+
+      const row = `
+        <tr>
+          <td>${b.sender}</td>
+          <td>${b.receiver}</td>
+          <td>${b.pickup}</td>
+          <td>${b.dropoff}</td>
+          <td>${b.status}</td>
+          <td>${actionBtn}</td>
+        </tr>`;
+      tbody.innerHTML += row;
+    });
+
+    // 🧮 Driver stats
+    let driverPoints = parseFloat(localStorage.getItem("driverPoints")) || 0;
+    let driverLevel = parseFloat(localStorage.getItem("driverLevel")) || 1;
+    let completed = parseInt(localStorage.getItem("driverCompleted")) || 0;
+
+    // 🚚 Accept Delivery
+    function acceptDelivery(index) {
+      deliveries[index].status = "Accepted";
+      localStorage.setItem("bookings", JSON.stringify(deliveries));
+
+      driverPoints += 1.5;
+      completed++;
+      if (completed % 4 === 0) driverLevel++;
+
+      localStorage.setItem("driverPoints", driverPoints.toFixed(2));
+      localStorage.setItem("driverLevel", driverLevel);
+      localStorage.setItem("driverCompleted", completed);
+
+      alert("✅ Delivery accepted!");
+      location.reload();
+    }
+
+    // 🗺️ View Route on Map
+    function viewRoute(index) {
+      // clear previous markers and line
+      markers.forEach(m => map.removeLayer(m));
+      if (routeLine) map.removeLayer(routeLine);
+      markers = [];
+
+      const b = deliveries[index];
+      if (b.pickupCoords && b.dropCoords) {
+        const pickup = L.marker(b.pickupCoords).addTo(map).bindPopup("Pickup: " + b.pickup);
+        const dropoff = L.marker(b.dropCoords).addTo(map).bindPopup("Drop-off: " + b.dropoff);
+        markers.push(pickup, dropoff);
+
+        // draw line between pickup and drop-off
+        routeLine = L.polyline([b.pickupCoords, b.dropCoords], { color: 'blue' }).addTo(map);
+        map.fitBounds(routeLine.getBounds().pad(0.3));
+      } else {
+        alert("⚠️ No coordinates available for this booking.");
+      }
+    }
+
+    // 🧾 Update stats display
+    document.getElementById("driverStats").innerText =
+      `⭐ Level: ${driverLevel} | Points: ${driverPoints.toFixed(2)} | Completed: ${completed}`;
+
+    // 🚪 Logout
+    function logout() {
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("rememberUser");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

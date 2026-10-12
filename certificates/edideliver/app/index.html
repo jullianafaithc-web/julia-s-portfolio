@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdiDeliver  – Customer Booking</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      position: relative;
+    }
+    button.logout {
+      position: absolute;
+      right: 15px;
+      top: 12px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 500px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #map {
+      height: 300px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    🚚 EdiDeliver – Book a Delivery
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="container">
+    <h2>📦 Delivery Form</h2>
+
+    <label>Sender Name:</label>
+    <input type="text" id="sender" placeholder="Enter sender name">
+
+    <label>Receiver Name:</label>
+    <input type="text" id="receiver" placeholder="Enter receiver name">
+
+    <label>Pickup Address:</label>
+    <input type="text" id="pickup" placeholder="Click on map or type manually">
+
+    <label>Drop-off Address:</label>
+    <input type="text" id="dropoff" placeholder="Click on map or type manually">
+
+    <div id="map"></div>
+
+    <label>Weight Class:</label>
+    <select id="weight">
+      <option value="Small (₱50)">Small (₱50)</option>
+      <option value="Medium (₱100)">Medium (₱100)</option>
+      <option value="Large (₱150)">Large (₱150)</option>
+      <option value="Extra Large (₱200)">Extra Large (₱200)</option>
+    </select>
+
+    <label>Mode of Payment:</label>
+    <select id="payment">
+      <option>GCash</option>
+      <option>Maya</option>
+      <option>Cash on Delivery</option>
+      <option>PayPal</option>
+      <option>Others</option>
+    </select>
+
+    <button onclick="bookDelivery()">Submit Booking</button>
+  </div>
+
+  <!-- Leaflet Map -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 🔐 Session check
+    const loggedUser = JSON.parse(localStorage.getItem("loggedUser"));
+    if (!loggedUser) window.location.href = "login.html";
+
+    // 🗺️ Initialize OpenStreetMap
+    let map = L.map('map').setView([14.5995, 120.9842], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 📍 Markers and Route Line
+    let pickupMarker = null;
+    let dropMarker = null;
+    let pickupCoords = null;
+    let dropCoords = null;
+    let isPickup = true;
+    let routeLine = null; // new: line between pickup and drop-off
+
+    map.on('click', function(e) {
+      if (isPickup) {
+        // Set pickup marker
+        if (pickupMarker) map.removeLayer(pickupMarker);
+        pickupMarker = L.marker(e.latlng).addTo(map).bindPopup("Pickup Point");
+        pickupCoords = e.latlng;
+        document.getElementById("pickup").value =
+          `Lat: ${e.latlng.lat.toFixed(5)}, Lng: ${e.latlng.lng.toFixed(5)}`;
+        alert("✅ Pickup location set. Now click drop-off point on map.");
+      } else {
+        // Set drop-off marker
+        if (dropMarker) map.removeLayer(dropMarker);
+        dropMarker = L.marker(e.latlng).addTo(map).bindPopup("Drop-off Point");
+        dropCoords = e.latlng;
+        document.getElementById("dropoff").value =
+          `Lat: ${e.latlng.lat.toFixed(5)}, Lng: ${e.latlng.lng.toFixed(5)}`;
+
+        // 🗺️ Draw route line between pickup and drop-off
+        if (routeLine) map.removeLayer(routeLine);
+        if (pickupCoords && dropCoords) {
+          routeLine = L.polyline([pickupCoords, dropCoords], { color: 'blue' }).addTo(map);
+          map.fitBounds(routeLine.getBounds().pad(0.3));
+        }
+      }
+      isPickup = !isPickup;
+    });
+
+    // 🚚 Submit Booking
+    function bookDelivery() {
+      const sender = document.getElementById("sender").value.trim();
+      const receiver = document.getElementById("receiver").value.trim();
+      const pickup = document.getElementById("pickup").value.trim();
+      const dropoff = document.getElementById("dropoff").value.trim();
+      const weight = document.getElementById("weight").value;
+      const payment = document.getElementById("payment").value;
+
+      if (!sender || !receiver || !pickup || !dropoff) {
+        alert("⚠️ Please complete all fields and set map locations.");
+        return;
+      }
+
+      const booking = {
+        sender,
+        receiver,
+        pickup,
+        dropoff,
+        weight,
+        payment,
+        pickupCoords,
+        dropCoords,
+        status: "Pending"
+      };
+
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      bookings.push(booking);
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+
+      let custRewards = parseFloat(localStorage.getItem("customerRewards")) || 0;
+      custRewards += 0.75;
+      localStorage.setItem("customerRewards", custRewards.toFixed(2));
+
+      alert("✅ Booking submitted successfully!");
+      location.reload();
+    }
+
+    // 🚪 Logout Function
+    function logout() {
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("rememberUser");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

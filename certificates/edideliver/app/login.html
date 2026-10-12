@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdiDeliver – Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #007bff, #00bfff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      width: 320px;
+      text-align: center;
+      position: relative;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .forgot, .signup {
+      display: block;
+      margin-top: 8px;
+      font-size: 14px;
+      color: #007bff;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .forgot:hover, .signup:hover {
+      text-decoration: underline;
+    }
+    .rocket {
+      font-size: 40px;
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="rocket">🚀</div>
+    <h2>EdiDeliver Login</h2>
+
+    <input type="text" id="username" placeholder="Enter username" />
+    <input type="password" id="password" placeholder="Enter password" />
+
+    <select id="role">
+      <option value="">-- Select Role --</option>
+      <option value="customer">Customer</option>
+      <option value="driver">Driver</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button onclick="login()">Login</button>
+    <a href="#" class="forgot" onclick="forgotPassword()">Forgot Password?</a>
+    <a href="signup.html" class="signup">Don’t have an account? Sign up here</a>
+  </div>
+
+  <script>
+    // Fetch users or defaults
+    const storedUsers = JSON.parse(localStorage.getItem("users")) || [
+      { username: "juan", password: "1234", role: "customer" },
+      { username: "pedro", password: "abcd", role: "driver" },
+      { username: "admin", password: "admin123", role: "admin" }
+    ];
+
+    function login() {
+      const uname = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+
+      if (!uname || !pass || !role) {
+        alert("⚠️ Please complete all fields.");
+        return;
+      }
+
+      const found = storedUsers.find(
+        u => u.username === uname && u.password === pass && u.role === role
+      );
+
+      if (!found) {
+        alert("❌ Invalid credentials. Try again.");
+        return;
+      }
+
+      localStorage.setItem("loggedUser", JSON.stringify(found));
+      alert(`✅ Welcome ${found.username}!`);
+
+      if (role === "customer") window.location.href = "index.html";
+      if (role === "driver") window.location.href = "driver.html";
+      if (role === "admin") window.location.href = "admin.html";
+    }
+
+    function forgotPassword() {
+      const uname = prompt("Enter your registered username:");
+      if (!uname) return;
+      const found = storedUsers.find(u => u.username === uname);
+      if (found) {
+        alert(`🔑 Password hint for ${uname}: ${found.password}`);
+      } else {
+        alert("⚠️ No user found with that username.");
+      }
+    }
+  </script>
+</body>
+</html>

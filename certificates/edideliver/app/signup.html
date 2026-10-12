@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdiDeliver  – Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 400px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    img {
+      display: none;
+      width: 100px;
+      margin-top: 5px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📝 Register Account</h2>
+
+    <label for="name">Full Name:</label>
+    <input type="text" id="name" placeholder="Enter full name" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter password" required>
+
+    <label for="number">Phone Number:</label>
+    <input type="tel" id="number" placeholder="Enter phone number" required>
+
+    <label for="role">Select Role:</label>
+    <select id="role">
+      <option value="customer">Customer</option>
+      <option value="driver">Driver</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <label id="idLabel">Upload Valid ID (Customer) / Driver's License (Driver):</label>
+    <input type="file" id="idUpload" accept="image/*">
+    <img id="idPreview">
+
+    <button onclick="registerUser()">Register</button>
+    <p style="text-align:center;">Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <script>
+    // Preview uploaded ID or license
+    document.getElementById("idUpload").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById("idPreview");
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function() {
+          preview.src = reader.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    function registerUser() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+      const number = document.getElementById("number").value.trim();
+      const idUpload = document.getElementById("idUpload").files[0];
+
+      if (!name || !email || !password || !number || !idUpload) {
+        alert("⚠️ Please fill in all fields and upload your ID or License.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function() {
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const exists = users.some(u => u.email === email);
+        if (exists) {
+          alert("⚠️ Email already registered!");
+          return;
+        }
+
+        users.push({
+          name,
+          email,
+          password,
+          role,
+          number,
+          idImage: reader.result
+        });
+
+        localStorage.setItem("users", JSON.stringify(users));
+        alert("✅ Registration successful!");
+        window.location.href = "login.html";
+      };
+
+      reader.readAsDataURL(idUpload);
+    }
+  </script>
+</body>
+</html>

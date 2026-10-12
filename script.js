@@ -1,4 +1,4 @@
-      const username = "jullianafaithc";
+      const username = "jullianafaithc-web";
       const apiBase = `https://api.github.com/users/${username}`;
       const projectGrid = document.querySelector("#project-grid");
       const loadStatus = document.querySelector("#load-status");
@@ -20,26 +20,221 @@
 
       document.querySelector("#current-year").textContent = new Date().getFullYear();
 
+      const root = document.documentElement;
+      const backgroundMotion = {
+        x: 0,
+        y: 0,
+      };
+
+      function updateBackgroundMotion() {
+        root.style.setProperty("--bg-shift-x", `${backgroundMotion.x}px`);
+        root.style.setProperty("--bg-shift-y", `${backgroundMotion.y}px`);
+        root.style.setProperty("--bg-scroll-shift", `${window.scrollY * 0.12}px`);
+      }
+
+      window.addEventListener("pointermove", (event) => {
+        const middleX = window.innerWidth / 2;
+        const middleY = window.innerHeight / 2;
+        backgroundMotion.x = (event.clientX - middleX) * 0.26;
+        backgroundMotion.y = (event.clientY - middleY) * 0.26;
+        updateBackgroundMotion();
+      });
+
+      window.addEventListener(
+        "touchmove",
+        (event) => {
+          const touch = event.touches[0];
+          if (!touch) return;
+          const middleX = window.innerWidth / 2;
+          const middleY = window.innerHeight / 2;
+          backgroundMotion.x = (touch.clientX - middleX) * 0.26;
+          backgroundMotion.y = (touch.clientY - middleY) * 0.26;
+          updateBackgroundMotion();
+        },
+        { passive: true },
+      );
+
+      window.addEventListener("scroll", updateBackgroundMotion, { passive: true });
+      updateBackgroundMotion();
+
+      const glitterCanvas = document.querySelector(".ambient-glitter");
+      const glitterContext = glitterCanvas.getContext("2d");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const glitterParticles = [];
+      let glitterFrame = 0;
+      let glitterWidth = 0;
+      let glitterHeight = 0;
+      let lastGlitterFrame = 0;
+
+      function resizeGlitterCanvas() {
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        glitterWidth = window.innerWidth;
+        glitterHeight = window.innerHeight;
+        glitterCanvas.width = Math.round(glitterWidth * pixelRatio);
+        glitterCanvas.height = Math.round(glitterHeight * pixelRatio);
+        glitterCanvas.style.width = `${glitterWidth}px`;
+        glitterCanvas.style.height = `${glitterHeight}px`;
+        glitterContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+        const particleCount = Math.min(260, Math.max(50, Math.round((glitterWidth * glitterHeight) / 7000)));
+        glitterParticles.length = 0;
+        for (let index = 0; index < particleCount; index += 1) {
+          glitterParticles.push({
+            x: Math.random() * glitterWidth,
+            y: Math.random() * glitterHeight,
+            radius: Math.random() < 0.08 ? 1.1 + Math.random() * 1.2 : 0.35 + Math.random() * 0.8,
+            opacity: 0.22 + Math.random() * 0.62,
+            phase: Math.random() * Math.PI * 2,
+            twinkleSpeed: 0.0008 + Math.random() * 0.002,
+            driftX: -0.12 + Math.random() * 0.24,
+            driftY: -0.32 - Math.random() * 0.34,
+          });
+        }
+
+        drawGlitter(0, 0);
+      }
+
+      function drawGlitter(time, elapsed) {
+        glitterContext.clearRect(0, 0, glitterWidth, glitterHeight);
+        glitterParticles.forEach((particle) => {
+          if (!reducedMotion.matches) {
+            particle.x += particle.driftX * elapsed;
+            particle.y += particle.driftY * elapsed;
+            if (particle.y < -3) particle.y = glitterHeight + 3;
+            if (particle.x < -3) particle.x = glitterWidth + 3;
+            if (particle.x > glitterWidth + 3) particle.x = -3;
+          }
+
+          const twinkle = reducedMotion.matches
+            ? 0.72
+            : 0.38 + (Math.sin(time * particle.twinkleSpeed + particle.phase) + 1) * 0.31;
+          const alpha = particle.opacity * twinkle;
+          glitterContext.beginPath();
+          glitterContext.fillStyle = `rgba(198, 255, 248, ${alpha})`;
+          glitterContext.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          glitterContext.fill();
+
+          if (particle.radius > 1) {
+            glitterContext.strokeStyle = `rgba(218, 255, 251, ${alpha * 0.55})`;
+            glitterContext.lineWidth = 0.55;
+            glitterContext.beginPath();
+            glitterContext.moveTo(particle.x - particle.radius * 1.8, particle.y);
+            glitterContext.lineTo(particle.x + particle.radius * 1.8, particle.y);
+            glitterContext.moveTo(particle.x, particle.y - particle.radius * 1.8);
+            glitterContext.lineTo(particle.x, particle.y + particle.radius * 1.8);
+            glitterContext.stroke();
+          }
+        });
+      }
+
+      function animateGlitter(time) {
+        if (document.hidden) {
+          glitterFrame = 0;
+          return;
+        }
+        const elapsed = lastGlitterFrame ? Math.min((time - lastGlitterFrame) / 16.67, 2) : 1;
+        lastGlitterFrame = time;
+        drawGlitter(time, elapsed);
+        glitterFrame = window.requestAnimationFrame(animateGlitter);
+      }
+
+      function startGlitterAnimation() {
+        if (!reducedMotion.matches && !document.hidden && !glitterFrame) {
+          glitterFrame = window.requestAnimationFrame(animateGlitter);
+        }
+      }
+
+      window.addEventListener("resize", resizeGlitterCanvas, { passive: true });
+      document.addEventListener("visibilitychange", startGlitterAnimation);
+      reducedMotion.addEventListener("change", () => {
+        lastGlitterFrame = 0;
+        if (reducedMotion.matches) {
+          window.cancelAnimationFrame(glitterFrame);
+          glitterFrame = 0;
+          drawGlitter(0, 0);
+        } else {
+          startGlitterAnimation();
+        }
+      });
+      resizeGlitterCanvas();
+      startGlitterAnimation();
+
       const documentDialog = document.querySelector("#project-document-dialog");
       projectGrid.addEventListener("click", (event) => {
+        const edideliverProject = event.target.closest("[data-edideliver-preview]");
+        if (edideliverProject) {
+          event.preventDefault();
+          document.querySelector("#edideliver-project-dialog").showModal();
+          return;
+        }
+
+        const lanProject = event.target.closest("[data-lan-preview]");
+        if (lanProject) {
+          event.preventDefault();
+          document.querySelector("#lan-project-dialog").showModal();
+          return;
+        }
+
         const previewLink = event.target.closest("[data-document-preview]");
         if (!previewLink) return;
         event.preventDefault();
         documentDialog.showModal();
       });
+      document.querySelector(".lan-project-card").addEventListener("keydown", (event) => {
+        if (event.target !== event.currentTarget || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        document.querySelector("#lan-project-dialog").showModal();
+      });
       document.querySelector(".project-document-close").addEventListener("click", () => {
         documentDialog.close();
       });
+      document.querySelector(".lan-document-close").addEventListener("click", () => {
+        document.querySelector("#lan-project-dialog").close();
+      });
+      document.querySelector(".edideliver-document-close").addEventListener("click", () => {
+        document.querySelector("#edideliver-project-dialog").close();
+      });
 
       const skillCategories = document.querySelectorAll(".skill-category");
+      const skillLaptop = document.querySelector(".skill-laptop");
+      const laptopScreen = document.querySelector(".laptop-screen");
+      const skillScreenFront = document.querySelector(".skill-screen-front");
+      const skillScreenBack = document.querySelector(".skill-screen-back");
+      const skillContextTitle = document.querySelector(".skill-context-title");
+      const skillTags = document.querySelector(".skill-screen-back .stack-tags");
+
+      function showCategoryFront() {
+        skillLaptop.classList.remove("is-showing-skills");
+        skillScreenFront.inert = false;
+        skillScreenFront.setAttribute("aria-hidden", "false");
+        skillScreenBack.inert = true;
+        skillScreenBack.setAttribute("aria-hidden", "true");
+      }
+
+      laptopScreen.addEventListener("click", (event) => {
+        if (event.target.closest(".skill-category, .stack-tag")) return;
+        showCategoryFront();
+      });
+
       skillCategories.forEach((category) => {
-        category.addEventListener("toggle", () => {
-          if (!category.open) return;
-          skillCategories.forEach((otherCategory) => {
-            if (otherCategory !== category) otherCategory.open = false;
+        category.addEventListener("click", () => {
+          skillContextTitle.textContent = category.dataset.title;
+          skillTags.replaceChildren();
+          category.dataset.skills.split("|").forEach((skill) => {
+            const tag = document.createElement("span");
+            tag.className = "stack-tag";
+            tag.textContent = skill;
+            skillTags.append(tag);
           });
+          skillScreenFront.inert = true;
+          skillScreenFront.setAttribute("aria-hidden", "true");
+          skillScreenBack.inert = false;
+          skillScreenBack.setAttribute("aria-hidden", "false");
+          skillLaptop.classList.add("is-showing-skills");
         });
       });
+
+      document.querySelector(".skill-screen-back-button").addEventListener("click", showCategoryFront);
 
       function observeScrollReveals(root = document) {
         const elements = root.querySelectorAll(
@@ -183,19 +378,19 @@
 
       function renderRepositories(repositories) {
         const publicRepos = repositories
-          .filter((repo) => !repo.fork && !repo.archived)
+          .filter((repo) => repo.name !== "julia-s-portfolio" && !repo.fork && !repo.archived)
           .sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.pushed_at) - new Date(a.pushed_at))
           .slice(0, 6);
 
-        const heatbeatProject = projectGrid.querySelector("[data-document-preview]");
-        projectGrid.replaceChildren(loadStatus, ...(heatbeatProject ? [heatbeatProject] : []));
+        const featuredProjects = [
+          projectGrid.querySelector("[data-document-preview]"),
+          projectGrid.querySelector(".lan-project-card"),
+          projectGrid.querySelector(".edideliver-project-card"),
+        ].filter(Boolean);
+        projectGrid.replaceChildren(loadStatus, ...featuredProjects);
         projectGrid.setAttribute("aria-busy", "false");
 
         if (publicRepos.length === 0) {
-          const empty = document.createElement("p");
-          empty.className = "load-message";
-          empty.textContent = "No public projects to show just yet. Check back soon.";
-          projectGrid.append(empty);
           loadStatus.textContent = "No public projects were found.";
         } else {
           publicRepos.forEach((repo, index) => projectGrid.append(makeProjectCard(repo, index)));
@@ -207,7 +402,11 @@
 
       function showProjectError() {
         projectGrid.setAttribute("aria-busy", "false");
-        const heatbeatProject = projectGrid.querySelector("[data-document-preview]");
+        const featuredProjects = [
+          projectGrid.querySelector("[data-document-preview]"),
+          projectGrid.querySelector(".lan-project-card"),
+          projectGrid.querySelector(".edideliver-project-card"),
+        ].filter(Boolean);
         const message = document.createElement("p");
         message.className = "load-message";
         message.textContent = "Projects couldn’t load right now. You can still browse all public repositories on GitHub.";
@@ -217,7 +416,7 @@
         link.rel = "noreferrer";
         link.textContent = " View repositories ↗";
         message.append(link);
-        projectGrid.replaceChildren(loadStatus, ...(heatbeatProject ? [heatbeatProject] : []), message);
+        projectGrid.replaceChildren(loadStatus, ...featuredProjects, message);
         observeScrollReveals(projectGrid);
         loadStatus.textContent = "Projects could not be loaded from GitHub.";
       }
@@ -241,6 +440,8 @@
           showProjectError();
         }
       }
+
+      loadPortfolio();
 
       /* Custom portfolio content is defined in the static markup above. */
     

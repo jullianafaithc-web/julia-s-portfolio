@@ -20,9 +20,12 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=Playfair+Display:wght@400..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=7" />
   </head>
   <body>
+    <div class="ambient-backdrop" aria-hidden="true">
+      <canvas class="ambient-glitter"></canvas>
+    </div>
     <header class="site-header">
       <nav class="nav shell" aria-label="Main navigation">
         <a class="wordmark" href="#home" aria-label="Julia home">
@@ -35,7 +38,7 @@
           <a href="#education">Education</a>
           <a href="#work">Projects</a>
           <a href="#contact">Contact</a>
-          <a class="nav-github" id="nav-github" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer">
+          <a class="nav-github" id="nav-github" href="https://github.com/jullianafaithc-web" target="_blank" rel="noreferrer">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 .8a11.2 11.2 0 0 0-3.54 21.82c.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 .1.75 2.37 4.3 1.69.1-.73.4-1.23.72-1.51-2.5-.28-5.14-1.25-5.14-5.57 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.13-1.45 3.07-1.15 3.07-1.15.61 1.55.23 2.7.12 2.98.72.79 1.15 1.8 1.15 3.02 0 4.33-2.64 5.29-5.15 5.56.41.36.77 1.04.77 2.1v3.11c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z" />
             </svg>
@@ -48,7 +51,7 @@
     <main id="home">
       <section class="hero shell" aria-labelledby="hero-title">
         <div>
-          <p class="eyebrow">Pitch Presenter / System Analyst</p>
+          <p class="eyebrow">visual editor/ System Analyst/ pitch presenter</p>
           <h1 id="hero-title"><span class="hero-greeting">Hello, I’m</span> <span class="hero-name" id="hero-name">JULLIANA CADIMAS</span></h1>
           <p class="tagline" id="tagline">Curious mind, engineer in progress</p>
           <p class="hero-copy" id="hero-copy">
@@ -61,7 +64,7 @@
                 <path d="M5 12h14m-6-6 6 6-6 6" />
               </svg>
             </a>
-            <a class="button button-secondary" id="hero-github" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer">
+            <a class="button button-secondary" id="hero-github" href="https://github.com/jullianafaithc-web" target="_blank" rel="noreferrer">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 .8a11.2 11.2 0 0 0-3.54 21.82c.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 .1.75 2.37 4.3 1.69.1-.73.4-1.23.72-1.51-2.5-.28-5.14-1.25-5.14-5.57 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.13-1.45 3.07-1.15 3.07-1.15.61 1.55.23 2.7.12 2.98.72.79 1.15 1.8 1.15 3.02 0 4.33-2.64 5.29-5.15 5.56.41.36.77 1.04.77 2.1v3.11c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z" />
               </svg>
@@ -84,12 +87,12 @@
                 alt="Julia's profile photo"
               />
             </a>
-            <p class="profile-handle" id="profile-handle">@jullianafaithc</p>
+            <p class="profile-handle" id="profile-handle">@jullianafaithc-web</p>
           </div>
           <div class="profile-facts" aria-label="GitHub profile statistics">
             <div><span class="fact-value" id="repo-count">—</span><span class="fact-label">Repos</span></div>
-            <div><span class="fact-value" id="follower-count">—</span><span class="fact-label">Followers</span></div>
-            <div><span class="fact-value" id="following-count">—</span><span class="fact-label">Following</span></div>
+            <div><span class="fact-value" id="follower-count">0</span><span class="fact-label">Followers</span></div>
+            <div><span class="fact-value" id="following-count">0</span><span class="fact-label">Following</span></div>
           </div>
           <div class="profile-meta">
             <div class="meta-row" id="location-row">
@@ -102,7 +105,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18" />
               </svg>
-              <a id="profile-website" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer">github.com/jullianafaithc</a>
+              <a id="profile-website" href="https://github.com/jullianafaithc-web" target="_blank" rel="noreferrer">github.com/jullianafaithc-web</a>
             </div>
             <div class="meta-row" id="company-row">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -147,10 +150,17 @@
               </div>
             </a>
 
-            <article class="project-card">
+            <article
+              class="project-card lan-project-card"
+              role="button"
+              data-lan-preview
+              tabindex="0"
+              aria-haspopup="dialog"
+              aria-label="View images and documents for Three-Storey ICCT Campus LAN Design"
+            >
               <div class="project-topline">
                 <span class="project-folder">Network Design</span>
-                <span class="project-stats"><span class="project-stat">📡 LAN</span></span>
+                <span class="project-stats"><span class="project-stat">📡 LAN · View files ↗</span></span>
               </div>
               <h3 class="project-title">Three-Storey ICCT Campus LAN Design</h3>
               <p class="project-description">
@@ -160,12 +170,19 @@
                 <span><strong>Tech:</strong> LAN, extended-star topology, CAT6 Ethernet, Dell all-in-one computers, D-Link switches, TP-Link routers, IP addressing, network planning.</span>
                 <span><strong>Role:</strong> Network design and equipment selection.</span>
               </div>
+              <span class="lan-project-open">View project files ↗</span>
             </article>
 
-            <article class="project-card">
+            <a
+              class="project-card edideliver-project-card"
+              href="#edideliver-project-dialog"
+              data-edideliver-preview
+              aria-haspopup="dialog"
+              aria-label="View the EdiDeliver app, project archive, and final report"
+            >
               <div class="project-topline">
                 <span class="project-folder">System Planning</span>
-                <span class="project-stats"><span class="project-stat">🧩 App</span></span>
+                <span class="project-stats"><span class="project-stat">🧩 App · View files ↗</span></span>
               </div>
               <h3 class="project-title">EdiDeliver Delivery Management System</h3>
               <p class="project-description">
@@ -175,63 +192,157 @@
                 <span><strong>Tech:</strong> Web/mobile application development, database management, user authentication, order management, delivery status tracking, and location-based services.</span>
                 <span><strong>Role:</strong> System documentation, requirements analysis, feature planning, and system workflow documentation.</span>
               </div>
-            </article>
+              <span class="lan-project-open">View project files ↗</span>
+            </a>
           </div>
           <dialog class="project-document-dialog" id="project-document-dialog" aria-labelledby="project-document-title">
             <div class="project-document-header">
               <h2 id="project-document-title">HeatBeat / ThermoHead Documentation</h2>
-              <div class="project-document-actions">
-                <a
-                  class="project-document-download"
-                  href="certificates/heatbeat-thermohead-project-docs.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                >Open PDF ↗</a>
-                <button class="project-document-close" type="button" aria-label="Close documentation">×</button>
-              </div>
+              <button class="project-document-close" type="button" aria-label="Close project files">×</button>
             </div>
             <div class="project-document-content">
-              <iframe
-                id="project-document-frame"
-                src="certificates/heatbeat-thermohead-project-docs.pdf"
-                title="HeatBeat / ThermoHead project documentation"
-              ></iframe>
               <section class="project-photo-gallery" aria-labelledby="project-photo-title">
                 <h3 id="project-photo-title">Project photos</h3>
                 <div class="project-photo-grid">
                   <figure>
-                    <img
-                      src="certificates/heatbeat/heatbeat-project-photo.jpg"
-                      alt="ThermoHead concept showing the wearable device, sensors, OLED display, and phone alert"
-                      loading="lazy"
-                    />
+                    <a href="certificates/heatbeat/heatbeat-project-photo.jpg" target="_blank" rel="noreferrer">
+                      <img src="certificates/heatbeat/heatbeat-project-photo.jpg" alt="ThermoHead concept showing the wearable device, sensors, OLED display, and phone alert" loading="lazy" />
+                    </a>
                     <figcaption>ThermoHead concept and features</figcaption>
                   </figure>
                   <figure>
-                    <img
-                      src="certificates/heatbeat/heatbeat-team-photo.jpg"
-                      alt="HeatBeat project team"
-                      loading="lazy"
-                    />
+                    <a href="certificates/heatbeat/heatbeat-team-photo.jpg" target="_blank" rel="noreferrer">
+                      <img src="certificates/heatbeat/heatbeat-team-photo.jpg" alt="HeatBeat project team" loading="lazy" />
+                    </a>
                     <figcaption>Project team</figcaption>
                   </figure>
                   <figure>
-                    <img
-                      src="certificates/heatbeat/heatbeat-prototype.jpg"
-                      alt="HeatBeat prototype with its OLED display and connected components"
-                      loading="lazy"
-                    />
+                    <a href="certificates/heatbeat/heatbeat-prototype.jpg" target="_blank" rel="noreferrer">
+                      <img src="certificates/heatbeat/heatbeat-prototype.jpg" alt="HeatBeat prototype with its OLED display and connected components" loading="lazy" />
+                    </a>
                     <figcaption>HeatBeat prototype</figcaption>
                   </figure>
                   <figure>
-                    <img
-                      src="certificates/heatbeat/heatbeat-schematic.jpg"
-                      alt="Seeed XIAO schematic diagram with power, sensors, outputs, and display connections"
-                      loading="lazy"
-                    />
+                    <a href="certificates/heatbeat/heatbeat-schematic.jpg" target="_blank" rel="noreferrer">
+                      <img src="certificates/heatbeat/heatbeat-schematic.jpg" alt="Seeed XIAO schematic diagram with power, sensors, outputs, and display connections" loading="lazy" />
+                    </a>
                     <figcaption>Seeed XIAO schematic</figcaption>
                   </figure>
                 </div>
+              </section>
+              <section class="lan-project-documents" aria-labelledby="project-documents-title">
+                <h3 id="project-documents-title">Project documents</h3>
+                <ul class="lan-document-list">
+                  <li>
+                    <a href="certificates/heatbeat-thermohead-project-docs.pdf" target="_blank" rel="noreferrer">
+                      Open project documentation <span>Open PDF ↗</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="certificates/heatbeat-thermohead-project-docs.pdf" download>
+                      Download project documentation <span>Download PDF ↓</span>
+                    </a>
+                  </li>
+                </ul>
+              </section>
+            </div>
+          </dialog>
+          <dialog class="project-document-dialog lan-project-dialog" id="lan-project-dialog" aria-labelledby="lan-project-title">
+            <div class="project-document-header">
+              <h2 id="lan-project-title">Three-Storey ICCT Campus LAN Design</h2>
+              <button class="project-document-close lan-document-close" type="button" aria-label="Close LAN project files">×</button>
+            </div>
+            <div class="project-document-content">
+              <section class="project-photo-gallery" aria-labelledby="lan-project-images-title">
+                <h3 id="lan-project-images-title">Project images</h3>
+                <div class="project-photo-grid">
+                  <figure>
+                    <a href="certificates/campus-lan/1a363390-33e4-4c97-88b5-f3d315caa53b.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/1a363390-33e4-4c97-88b5-f3d315caa53b.webp" alt="Campus LAN project image 1" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 1</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/2lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/2lan.webp" alt="Campus LAN project image 2" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 2</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/2.2lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/2.2lan.webp" alt="Campus LAN project image 3" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 3</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/3lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/3lan.webp" alt="Campus LAN project image 4" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 4</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/4lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/4lan.webp" alt="Campus LAN project image 5" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 5</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/5lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/5lan.webp" alt="Campus LAN project image 6" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 6</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/6lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/6lan.webp" alt="Campus LAN project image 7" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 7</figcaption>
+                  </figure>
+                  <figure>
+                    <a href="certificates/campus-lan/7lan.webp" target="_blank" rel="noreferrer">
+                      <img src="certificates/campus-lan/7lan.webp" alt="Campus LAN project image 8" loading="lazy" />
+                    </a>
+                    <figcaption>Campus LAN project image 8</figcaption>
+                  </figure>
+                </div>
+              </section>
+              <section class="lan-project-documents" aria-labelledby="lan-project-documents-title">
+                <h3 id="lan-project-documents-title">Project documents</h3>
+                <ul class="lan-document-list">
+                  <li><a href="certificates/campus-lan/LAN_chapter-12.docx" target="_blank" rel="noreferrer" download>LAN_chapter-12.docx <span>Open / download ↗</span></a></li>
+                  <li><a href="certificates/campus-lan/LAN_chapter-3.docx" target="_blank" rel="noreferrer" download>LAN_chapter-3.docx <span>Open / download ↗</span></a></li>
+                  <li><a href="certificates/campus-lan/LAN_chapter-45.docx" target="_blank" rel="noreferrer" download>LAN_chapter-45.docx <span>Open / download ↗</span></a></li>
+                  <li><a href="certificates/campus-lan/revision-4.0-4.1-chapter-5.docx" target="_blank" rel="noreferrer" download>revision-4.0-4.1-chapter-5.docx <span>Open / download ↗</span></a></li>
+                  <li><a href="certificates/campus-lan/CHAPTER-6-Safety.pdf" target="_blank" rel="noreferrer">CHAPTER-6-Safety.pdf <span>Open PDF ↗</span></a></li>
+                  <li><a href="certificates/campus-lan/Chapter-7.docx" target="_blank" rel="noreferrer" download>Chapter-7.docx <span>Open / download ↗</span></a></li>
+                </ul>
+              </section>
+            </div>
+          </dialog>
+          <dialog class="project-document-dialog edideliver-project-dialog" id="edideliver-project-dialog" aria-labelledby="edideliver-project-title">
+            <div class="project-document-header">
+              <h2 id="edideliver-project-title">EdiDeliver Delivery Management System</h2>
+              <button class="project-document-close edideliver-document-close" type="button" aria-label="Close EdiDeliver project files">×</button>
+            </div>
+            <div class="project-document-content">
+              <section class="lan-project-documents" aria-labelledby="edideliver-preview-title">
+                <h3 id="edideliver-preview-title">Application pages</h3>
+                <p class="edideliver-project-note">Open the customer booking page or browse the included account and operations pages.</p>
+                <ul class="lan-document-list">
+                  <li><a href="certificates/edideliver/app/index.html" target="_blank" rel="noreferrer">Customer booking app <span>Launch ↗</span></a></li>
+                  <li><a href="certificates/edideliver/app/login.html" target="_blank" rel="noreferrer">Login page <span>Open ↗</span></a></li>
+                  <li><a href="certificates/edideliver/app/signup.html" target="_blank" rel="noreferrer">Sign-up page <span>Open ↗</span></a></li>
+                  <li><a href="certificates/edideliver/app/driver.html" target="_blank" rel="noreferrer">Driver page <span>Open ↗</span></a></li>
+                  <li><a href="certificates/edideliver/app/admin.html" target="_blank" rel="noreferrer">Admin page <span>Open ↗</span></a></li>
+                  <li><a href="certificates/edideliver/app/forgot_password.html" target="_blank" rel="noreferrer">Password recovery page <span>Open ↗</span></a></li>
+                </ul>
+              </section>
+              <section class="lan-project-documents" aria-labelledby="edideliver-downloads-title">
+                <h3 id="edideliver-downloads-title">Project files</h3>
+                <ul class="lan-document-list">
+                  <li><a href="certificates/edideliver/EDIDELIVER.zip" download>EDIDELIVER.zip <span>Download ↗</span></a></li>
+                  <li><a href="certificates/edideliver/FINAL.docx" download>FINAL.docx <span>Download ↗</span></a></li>
+                </ul>
               </section>
             </div>
           </dialog>
@@ -249,45 +360,36 @@
           </div>
           <div class="stack-panel" id="skills">
             <p class="stack-title">Tools &amp; skills</p>
-            <div class="skill-categories" role="group" aria-label="Skill categories">
-              <details class="skill-category">
-                <summary>Programming</summary>
-                <div class="stack-tags">
-                  <span class="stack-tag">C++</span>
-                  <span class="stack-tag">Java</span>
-                  <span class="stack-tag">JavaScript</span>
-                  <span class="stack-tag">HTML</span>
-                  <span class="stack-tag">CSS</span>
+            <div class="skill-laptop">
+              <div class="laptop-screen">
+                <div class="skill-screen-flip">
+                  <div class="skill-screen-face skill-screen-front">
+                    <div class="skill-categories" role="group" aria-label="Skill categories">
+                      <button class="skill-category" type="button" data-title="Programming" data-skills="C++|Java|JavaScript|HTML|CSS">
+                        Programming
+                      </button>
+                      <button class="skill-category" type="button" data-title="Embedded Systems" data-skills="Microcontrollers|Sensors|Hardware integration">
+                        Embedded Systems
+                      </button>
+                      <button class="skill-category" type="button" data-title="Networking" data-skills="Basic networking|Cisco configuration|VLAN|Routing">
+                        Networking
+                      </button>
+                      <button class="skill-category" type="button" data-title="Professional Skills" data-skills="Problem solving|Teamwork|Communication|AI prompting|Video editing|Graphic design">
+                        Professional Skills
+                      </button>
+                      <button class="skill-category" type="button" data-title="Tools" data-skills="Canva|CapCut|VS Code|AutoCAD">
+                        Tools
+                      </button>
+                    </div>
+                  </div>
+                  <div class="skill-screen-face skill-screen-back" aria-hidden="true" inert>
+                    <button class="skill-screen-back-button" type="button">← All categories</button>
+                    <h3 class="skill-context-title"></h3>
+                    <div class="stack-tags"></div>
+                  </div>
                 </div>
-              </details>
-              <details class="skill-category">
-                <summary>Embedded Systems</summary>
-                <div class="stack-tags">
-                  <span class="stack-tag">Microcontrollers</span>
-                  <span class="stack-tag">Sensors</span>
-                  <span class="stack-tag">Hardware integration</span>
-                </div>
-              </details>
-              <details class="skill-category">
-                <summary>Networking</summary>
-                <div class="stack-tags">
-                  <span class="stack-tag">Basic networking</span>
-                  <span class="stack-tag">Cisco configuration</span>
-                  <span class="stack-tag">VLAN</span>
-                  <span class="stack-tag">Routing</span>
-                </div>
-              </details>
-              <details class="skill-category">
-                <summary>Professional Skills</summary>
-                <div class="stack-tags">
-                  <span class="stack-tag">Problem solving</span>
-                  <span class="stack-tag">Teamwork</span>
-                  <span class="stack-tag">Communication</span>
-                  <span class="stack-tag">AI prompting</span>
-                  <span class="stack-tag">Video editing</span>
-                  <span class="stack-tag">Graphic design</span>
-                </div>
-              </details>
+              </div>
+              <div class="laptop-base" aria-hidden="true"></div>
             </div>
           </div>
         </div>
@@ -355,7 +457,7 @@
                   </svg>
               </span>
             </a>
-            <a class="contact-logo-link" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer" aria-label="Open Julia's GitHub profile">
+            <a class="contact-logo-link" href="https://github.com/jullianafaithc-web" target="_blank" rel="noreferrer" aria-label="Open Julia's GitHub profile">
               <span class="contact-app-icon contact-app-github" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 .8a11.2 11.2 0 0 0-3.54 21.82c.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 .1.75 2.37 4.3 1.69.1-.73.4-1.23.72-1.51-2.5-.28-5.14-1.25-5.14-5.57 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.13-1.45 3.07-1.15 3.07-1.15.61 1.55.23 2.7.12 2.98.72.79 1.15 1.8 1.15 3.02 0 4.33-2.64 5.29-5.15 5.56.41.36.77 1.04.77 2.1v3.11c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z" />
@@ -385,11 +487,11 @@
 
     <footer class="site-footer">
       <div class="shell footer-inner">
-        <span>© <span id="current-year"></span> Juliana Faith</span>
-        <a class="footer-link" id="footer-github" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer">Built in the open ↗</a>
+        <span>© <span id="current-year"></span> Julliana Faith</span>
+        <a class="footer-link" id="footer-github" href="https://github.com/jullianafaithc-web" target="_blank" rel="noreferrer">Built in the open ↗</a>
       </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=12"></script>
   </body>
 </html>
