@@ -2,8 +2,62 @@
       const apiBase = `https://api.github.com/users/${username}`;
       const projectGrid = document.querySelector("#project-grid");
       const loadStatus = document.querySelector("#load-status");
+      const revealObserver =
+        "IntersectionObserver" in window &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? new IntersectionObserver(
+              (entries, observer) => {
+                entries.forEach((entry) => {
+                  if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                  }
+                });
+              },
+              { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+            )
+          : null;
 
       document.querySelector("#current-year").textContent = new Date().getFullYear();
+
+      const documentDialog = document.querySelector("#project-document-dialog");
+      projectGrid.addEventListener("click", (event) => {
+        const previewLink = event.target.closest("[data-document-preview]");
+        if (!previewLink) return;
+        event.preventDefault();
+        documentDialog.showModal();
+      });
+      document.querySelector(".project-document-close").addEventListener("click", () => {
+        documentDialog.close();
+      });
+
+      const skillCategories = document.querySelectorAll(".skill-category");
+      skillCategories.forEach((category) => {
+        category.addEventListener("toggle", () => {
+          if (!category.open) return;
+          skillCategories.forEach((otherCategory) => {
+            if (otherCategory !== category) otherCategory.open = false;
+          });
+        });
+      });
+
+      function observeScrollReveals(root = document) {
+        const elements = root.querySelectorAll(
+          ".section-heading, .project-card, .about-grid > div, .timeline-item, .contact-card, .profile-card",
+        );
+        elements.forEach((element, index) => {
+          if (element.classList.contains("scroll-reveal")) return;
+          element.classList.add("scroll-reveal");
+          element.style.setProperty("--reveal-delay", `${(index % 4) * 80}ms`);
+          if (revealObserver) {
+            revealObserver.observe(element);
+          } else {
+            element.classList.add("is-visible");
+          }
+        });
+      }
+
+      observeScrollReveals();
 
       function setText(selector, value) {
         const element = document.querySelector(selector);
@@ -56,16 +110,6 @@
         if (profile.company) {
           setText("#profile-company", profile.company);
           document.querySelector("#company-row").hidden = false;
-        }
-
-        if (profile.blog) {
-          const website = document.querySelector("#profile-website");
-          const websiteUrl = /^https?:\/\//i.test(profile.blog)
-            ? profile.blog
-            : `https://${profile.blog}`;
-          website.href = websiteUrl;
-          website.textContent = profile.blog;
-          document.querySelector("#website-row").hidden = false;
         }
 
         for (const selector of ["#nav-github", "#hero-github", "#footer-github"]) {
@@ -143,7 +187,8 @@
           .sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.pushed_at) - new Date(a.pushed_at))
           .slice(0, 6);
 
-        projectGrid.replaceChildren();
+        const heatbeatProject = projectGrid.querySelector("[data-document-preview]");
+        projectGrid.replaceChildren(loadStatus, ...(heatbeatProject ? [heatbeatProject] : []));
         projectGrid.setAttribute("aria-busy", "false");
 
         if (publicRepos.length === 0) {
@@ -156,11 +201,13 @@
           publicRepos.forEach((repo, index) => projectGrid.append(makeProjectCard(repo, index)));
           loadStatus.textContent = `${publicRepos.length} GitHub projects loaded.`;
         }
+        observeScrollReveals(projectGrid);
 
       }
 
       function showProjectError() {
         projectGrid.setAttribute("aria-busy", "false");
+        const heatbeatProject = projectGrid.querySelector("[data-document-preview]");
         const message = document.createElement("p");
         message.className = "load-message";
         message.textContent = "Projects couldn’t load right now. You can still browse all public repositories on GitHub.";
@@ -170,7 +217,8 @@
         link.rel = "noreferrer";
         link.textContent = " View repositories ↗";
         message.append(link);
-        projectGrid.replaceChildren(message);
+        projectGrid.replaceChildren(loadStatus, ...(heatbeatProject ? [heatbeatProject] : []), message);
+        observeScrollReveals(projectGrid);
         loadStatus.textContent = "Projects could not be loaded from GitHub.";
       }
 

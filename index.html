@@ -7,7 +7,7 @@
       name="description"
       content="Portfolio of Juliana Faith E. Cadimas — computer engineering student, system analyst, and software developer."
     />
-    <meta name="theme-color" content="#f8f2ef" />
+    <meta name="theme-color" content="#071d24" />
     <title>Julliana Faith E. Cadimas — Portfolio</title>
     <link
       rel="icon"
@@ -98,11 +98,11 @@
               </svg>
               <span id="profile-location">Morong, Rizal</span>
             </div>
-            <div class="meta-row" id="website-row" hidden>
+            <div class="meta-row" id="website-row">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18" />
               </svg>
-              <a id="profile-website" target="_blank" rel="noreferrer"></a>
+              <a id="profile-website" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer">github.com/jullianafaithc</a>
             </div>
             <div class="meta-row" id="company-row">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -121,14 +121,21 @@
               <p class="section-kicker">Selected projects</p>
               <h2 id="work-title">Projects and systems I’ve worked on.</h2>
             </div>
-            <p class="section-note">Focused on practical engineering, digital systems, and user-centered solutions.</p>
+            <p class="section-note">These were collaborative team projects. The role listed on each card highlights my contribution.</p>
           </div>
           <div class="project-grid" id="project-grid" aria-live="polite">
             <p class="sr-only" id="load-status" role="status"></p>
-            <article class="project-card">
+            <a
+              class="project-card"
+              href="certificates/heatbeat-thermohead-project-docs.pdf"
+              target="_blank"
+              rel="noreferrer"
+              data-document-preview
+              aria-label="Open HeatBeat / ThermoHead project documentation"
+            >
               <div class="project-topline">
                 <span class="project-folder">Wearable Systems</span>
-                <span class="project-stats"><span class="project-stat">⚡ Prototype</span></span>
+                <span class="project-stats"><span class="project-stat">⚡ View documentation ↗</span></span>
               </div>
               <h3 class="project-title">HeatBeat / ThermoHead</h3>
               <p class="project-description">
@@ -136,9 +143,9 @@
               </p>
               <div class="project-meta">
                 <span><strong>Tech:</strong> Seeed XIAO ESP32-S3 Sense, MLX90614, MAX30102, 0.96-inch OLED, Bluetooth, TP4056 charging module, 3.7 V Li-Po battery, MT3608 boost converter.</span>
-                <span><strong>Role:</strong> Prototype and hardware/electronics development.</span>
+                <span><strong>Role:</strong> Documentation, feature planning, and ideation.</span>
               </div>
-            </article>
+            </a>
 
             <article class="project-card">
               <div class="project-topline">
@@ -170,6 +177,64 @@
               </div>
             </article>
           </div>
+          <dialog class="project-document-dialog" id="project-document-dialog" aria-labelledby="project-document-title">
+            <div class="project-document-header">
+              <h2 id="project-document-title">HeatBeat / ThermoHead Documentation</h2>
+              <div class="project-document-actions">
+                <a
+                  class="project-document-download"
+                  href="certificates/heatbeat-thermohead-project-docs.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                >Open PDF ↗</a>
+                <button class="project-document-close" type="button" aria-label="Close documentation">×</button>
+              </div>
+            </div>
+            <div class="project-document-content">
+              <iframe
+                id="project-document-frame"
+                src="certificates/heatbeat-thermohead-project-docs.pdf"
+                title="HeatBeat / ThermoHead project documentation"
+              ></iframe>
+              <section class="project-photo-gallery" aria-labelledby="project-photo-title">
+                <h3 id="project-photo-title">Project photos</h3>
+                <div class="project-photo-grid">
+                  <figure>
+                    <img
+                      src="certificates/heatbeat/heatbeat-project-photo.jpg"
+                      alt="ThermoHead concept showing the wearable device, sensors, OLED display, and phone alert"
+                      loading="lazy"
+                    />
+                    <figcaption>ThermoHead concept and features</figcaption>
+                  </figure>
+                  <figure>
+                    <img
+                      src="certificates/heatbeat/heatbeat-team-photo.jpg"
+                      alt="HeatBeat project team"
+                      loading="lazy"
+                    />
+                    <figcaption>Project team</figcaption>
+                  </figure>
+                  <figure>
+                    <img
+                      src="certificates/heatbeat/heatbeat-prototype.jpg"
+                      alt="HeatBeat prototype with its OLED display and connected components"
+                      loading="lazy"
+                    />
+                    <figcaption>HeatBeat prototype</figcaption>
+                  </figure>
+                  <figure>
+                    <img
+                      src="certificates/heatbeat/heatbeat-schematic.jpg"
+                      alt="Seeed XIAO schematic diagram with power, sensors, outputs, and display connections"
+                      loading="lazy"
+                    />
+                    <figcaption>Seeed XIAO schematic</figcaption>
+                  </figure>
+                </div>
+              </section>
+            </div>
+          </dialog>
         </div>
       </section>
 
@@ -184,7 +249,7 @@
           </div>
           <div class="stack-panel" id="skills">
             <p class="stack-title">Tools &amp; skills</p>
-            <div class="skill-categories">
+            <div class="skill-categories" role="group" aria-label="Skill categories">
               <details class="skill-category">
                 <summary>Programming</summary>
                 <div class="stack-tags">
@@ -219,6 +284,8 @@
                   <span class="stack-tag">Teamwork</span>
                   <span class="stack-tag">Communication</span>
                   <span class="stack-tag">AI prompting</span>
+                  <span class="stack-tag">Video editing</span>
+                  <span class="stack-tag">Graphic design</span>
                 </div>
               </details>
             </div>
@@ -237,28 +304,34 @@
           <div class="timeline">
             <div class="timeline-item">
               <span class="timeline-date">Education</span>
-              <h3>ICCT Colleges</h3>
+              <h3><a href="https://www.facebook.com/IM4ICCT/reels_tab" target="_blank" rel="noreferrer">ICCT Colleges</a></h3>
               <p>Bachelor’s in Computer Engineering</p>
             </div>
             <div class="timeline-item">
               <span class="timeline-date">March 6, 2025</span>
-              <h3>Advancing Research and Development in IoT for Smart Environments</h3>
+              <h3><a href="certificates/advancing%20research.pdf" target="_blank" rel="noreferrer">Advancing Research and Development in IoT for Smart Environments</a></h3>
               <p>Innovations and Future Directions</p>
               <p>Speaker: Engr. Mark Anthony V. Melendrez</p>
               <p>ICCT Colleges</p>
             </div>
             <div class="timeline-item">
               <span class="timeline-date">March 3, 2026</span>
-              <h3>Advancing Secure Networking for Smart Environment</h3>
+              <h3><a href="certificates/advancing%20secure%20networking.pdf" target="_blank" rel="noreferrer">Advancing Secure Networking for Smart Environment</a></h3>
               <p>Design, Threat Modeling, and Mitigation Strategies</p>
               <p>Speaker: Engr. Mark Anthony Melendrez</p>
               <p>ICCT Colleges</p>
             </div>
             <div class="timeline-item">
               <span class="timeline-date">March 3, 2026</span>
-              <h3>Bioinformatics and Digital Science Information in the Philippine Context</h3>
+              <h3><a href="certificates/bioinformatics.pdf" target="_blank" rel="noreferrer">Bioinformatics and Digital Science Information in the Philippine Context</a></h3>
               <p>Speaker: Dr. Ian Kendrick Fontanilla</p>
               <p>ICCT Colleges</p>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">February 10, 2026</span>
+              <h3><a href="certificates/safer%20internet%20day.pdf" target="_blank" rel="noreferrer">Safer Internet Day: Cybersecurity for Everyone</a></h3>
+              <p>Held by Carlo Paolo P. Murcia</p>
+              <p>Organized by the Department of Information and Communications Technology (DICT) CALABARZON Regional Office</p>
             </div>
           </div>
         </div>
@@ -270,19 +343,41 @@
             <div>
               <p class="section-kicker">Contact</p>
               <h2 id="contact-title">Let’s connect.</h2>
+              <a class="contact-message-link" href="mailto:jullianafaithc@gmail.com">Send me a message here!</a>
             </div>
           </div>
           <div class="contact-grid">
-            <div class="contact-card">
-              <h3>Email</h3>
-              <a href="mailto:jullianafaithc@gmail.com">jullianafaithc@gmail.com</a>
-              <span>Morong, Rizal</span>
-            </div>
-            <div class="contact-card">
-              <h3>GitHub</h3>
-              <a href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer">jullianafaithc</a>
-              <span>Pitch Presenter / System Analyst</span>
-            </div>
+            <a class="contact-logo-link" href="mailto:jullianafaithc@gmail.com" aria-label="Email Julia">
+              <span class="contact-app-icon contact-app-email" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="m4 7 8 6 8-6" />
+                  </svg>
+              </span>
+            </a>
+            <a class="contact-logo-link" href="https://github.com/jullianafaithc" target="_blank" rel="noreferrer" aria-label="Open Julia's GitHub profile">
+              <span class="contact-app-icon contact-app-github" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .8a11.2 11.2 0 0 0-3.54 21.82c.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 .1.75 2.37 4.3 1.69.1-.73.4-1.23.72-1.51-2.5-.28-5.14-1.25-5.14-5.57 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.13-1.45 3.07-1.15 3.07-1.15.61 1.55.23 2.7.12 2.98.72.79 1.15 1.8 1.15 3.02 0 4.33-2.64 5.29-5.15 5.56.41.36.77 1.04.77 2.1v3.11c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z" />
+                  </svg>
+              </span>
+            </a>
+            <a class="contact-logo-link" href="https://www.facebook.com/share/19FqjpWq51/" target="_blank" rel="noreferrer" aria-label="Open Julia's Facebook profile">
+              <span class="contact-app-icon contact-app-facebook" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13.5 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.5 1.6-1.5h1.7V3.9c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3V10H7.3v3h2.8v8h3.4Z" />
+                  </svg>
+              </span>
+            </a>
+            <a class="contact-logo-link" href="https://www.instagram.com/archived.yn?mdxt=MTQyaDQwbmE0NDBxdQ==" target="_blank" rel="noreferrer" aria-label="Open Julia's Instagram profile">
+              <span class="contact-app-icon contact-app-instagram" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.6" cy="6.7" r="0.8" fill="currentColor" stroke="none" />
+                  </svg>
+              </span>
+            </a>
           </div>
         </div>
       </section>
