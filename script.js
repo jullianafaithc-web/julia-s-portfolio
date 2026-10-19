@@ -2,6 +2,166 @@
       const apiBase = `https://api.github.com/users/${username}`;
       const projectGrid = document.querySelector("#project-grid");
       const loadStatus = document.querySelector("#load-status");
+      const projectCount = document.querySelector("#project-count");
+      const certificateCount = document.querySelector("#certificate-count");
+      const projectCarousel = document.querySelector(".project-carousel");
+      const projectPagination = document.querySelector(".project-carousel-pagination");
+      const projectMotionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let activeProjectIndex = 0;
+      let projectAutoplayTimer = 0;
+      let touchStartX = null;
+      let suppressProjectClickUntil = 0;
+
+      function syncProjectCarousel() {
+        const cards = [...projectGrid.children].filter((child) => child.classList.contains("project-card"));
+        if (!cards.length) {
+          projectPagination.replaceChildren();
+          return;
+        }
+
+        activeProjectIndex = ((activeProjectIndex % cards.length) + cards.length) % cards.length;
+        cards.forEach((card, index) => {
+          const offset = (index - activeProjectIndex + cards.length) % cards.length;
+          const position = offset === 0 ? "active" : offset === 1 ? "next" : offset === cards.length - 1 ? "previous" : "hidden";
+          card.classList.remove("is-active", "is-previous", "is-next", "is-hidden");
+          card.classList.add(`is-${position}`);
+          card.setAttribute("aria-roledescription", "slide");
+          card.setAttribute("aria-posinset", String(index + 1));
+          card.setAttribute("aria-setsize", String(cards.length));
+          card.setAttribute("aria-hidden", String(position === "hidden"));
+          card.inert = position === "hidden";
+        });
+
+        projectPagination.replaceChildren(
+          ...cards.map((_, index) => {
+            const dot = document.createElement("button");
+            dot.className = "project-carousel-dot";
+            dot.type = "button";
+            dot.setAttribute("aria-label", `Show project ${index + 1}`);
+            dot.setAttribute("aria-current", String(index === activeProjectIndex));
+            dot.addEventListener("click", () => setActiveProject(index));
+            return dot;
+          }),
+        );
+      }
+
+      function setActiveProject(index) {
+        const cards = [...projectGrid.children].filter((child) => child.classList.contains("project-card"));
+        if (!cards.length) return;
+        activeProjectIndex = (index + cards.length) % cards.length;
+        syncProjectCarousel();
+      }
+
+      function startProjectAutoplay() {
+        window.clearInterval(projectAutoplayTimer);
+        if (projectMotionPreference.matches) return;
+        projectAutoplayTimer = window.setInterval(() => {
+          if (document.hidden || document.querySelector("dialog[open]")) return;
+          setActiveProject(activeProjectIndex + 1);
+        }, 5600);
+      }
+
+      projectCarousel.addEventListener("pointerenter", () => window.clearInterval(projectAutoplayTimer));
+      projectCarousel.addEventListener("pointerleave", startProjectAutoplay);
+      projectCarousel.addEventListener("focusin", () => window.clearInterval(projectAutoplayTimer));
+      projectCarousel.addEventListener("focusout", (event) => {
+        if (!projectCarousel.contains(event.relatedTarget)) startProjectAutoplay();
+      });
+      projectCarousel.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (event.pointerType === "touch") touchStartX = event.clientX;
+        },
+        { passive: true },
+      );
+      projectCarousel.addEventListener(
+        "pointerup",
+        (event) => {
+          if (touchStartX === null) return;
+          const distance = event.clientX - touchStartX;
+          touchStartX = null;
+          if (Math.abs(distance) < 48) return;
+          suppressProjectClickUntil = Date.now() + 450;
+          setActiveProject(activeProjectIndex + (distance < 0 ? 1 : -1));
+          startProjectAutoplay();
+        },
+        { passive: true },
+      );
+      projectCarousel.addEventListener(
+        "pointercancel",
+        () => {
+          touchStartX = null;
+        },
+        { passive: true },
+      );
+      projectCarousel.addEventListener(
+        "click",
+        (event) => {
+          if (Date.now() < suppressProjectClickUntil && event.target.closest(".project-card")) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        },
+        true,
+      );
+      projectMotionPreference.addEventListener("change", startProjectAutoplay);
+      syncProjectCarousel();
+      startProjectAutoplay();
+      projectGrid.addEventListener(
+        "click",
+        (event) => {
+          const card = event.target.closest(".project-card");
+          if (!card || card.classList.contains("is-active")) return;
+          const cards = [...projectGrid.children].filter((child) => child.classList.contains("project-card"));
+          const index = cards.indexOf(card);
+          if (index < 0) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          setActiveProject(index);
+          startProjectAutoplay();
+        },
+        true,
+      );
+      projectGrid.addEventListener("keydown", (event) => {
+        const card = event.target.closest(".project-card");
+        if (!card || card.classList.contains("is-active") || (event.key !== "Enter" && event.key !== " ")) return;
+        const cards = [...projectGrid.children].filter((child) => child.classList.contains("project-card"));
+        const index = cards.indexOf(card);
+        if (index < 0) return;
+        event.preventDefault();
+        setActiveProject(index);
+        startProjectAutoplay();
+      });
+
+      function updatePortfolioCounts() {
+        projectCount.textContent = projectGrid.querySelectorAll(".project-card").length;
+        certificateCount.textContent = document.querySelectorAll(".certificate-entry").length;
+      }
+
+      updatePortfolioCounts();
+
+      const lanyardRig = document.querySelector("#lanyard-rig");
+      if (lanyardRig) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          lanyardRig.classList.add("is-dropped");
+        } else if ("IntersectionObserver" in window) {
+          const lanyardObserver = new IntersectionObserver(
+            (entries, observer) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  lanyardRig.classList.add("is-dropped");
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.15 },
+          );
+          lanyardObserver.observe(lanyardRig);
+        } else {
+          lanyardRig.classList.add("is-dropped");
+        }
+      }
+
       const revealObserver =
         "IntersectionObserver" in window &&
         !window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -18,9 +178,49 @@
             )
           : null;
 
-      document.querySelector("#current-year").textContent = new Date().getFullYear();
+      const yearElement = document.querySelector("#current-year");
+      if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
+      }
 
       const root = document.documentElement;
+      const portfolioThemes = [
+        { id: "radiant-deep-sea", name: "Radiant Deep Blue Sea" },
+        { id: "radiant-deep-ocean", name: "Radiant Blue Ocean Sea" },
+        { id: "radiant-black-sea", name: "Radiant Black Sea" },
+      ];
+      const themeToggle = document.querySelector("#theme-toggle");
+      try {
+        const savedTheme = window.localStorage.getItem("portfolio-theme");
+        if (portfolioThemes.some((theme) => theme.id === savedTheme)) {
+          root.dataset.theme = savedTheme;
+        }
+      } catch {
+        // Theme switching still works when browser storage is unavailable.
+      }
+
+      function updateThemeToggleLabel() {
+        const currentIndex = portfolioThemes.findIndex((theme) => theme.id === root.dataset.theme);
+        const nextTheme = portfolioThemes[(currentIndex + 1) % portfolioThemes.length];
+        themeToggle.setAttribute("aria-label", `Switch to ${nextTheme.name}`);
+        themeToggle.title = `Switch to ${nextTheme.name}`;
+      }
+
+      if (themeToggle) {
+        updateThemeToggleLabel();
+        themeToggle.addEventListener("click", () => {
+          const currentIndex = portfolioThemes.findIndex((theme) => theme.id === root.dataset.theme);
+          const nextTheme = portfolioThemes[(currentIndex + 1) % portfolioThemes.length];
+          root.dataset.theme = nextTheme.id;
+          try {
+            window.localStorage.setItem("portfolio-theme", nextTheme.id);
+          } catch {
+            // The selected theme remains active for this page load.
+          }
+          updateThemeToggleLabel();
+        });
+      }
+
       const backgroundMotion = {
         x: 0,
         y: 0,
@@ -56,6 +256,56 @@
 
       window.addEventListener("scroll", updateBackgroundMotion, { passive: true });
       updateBackgroundMotion();
+
+      const introGate = document.querySelector(".intro-gate");
+      if (introGate) {
+        const introMotionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const introReveal = {
+          x: 50,
+          y: 44,
+          targetX: 50,
+          targetY: 44,
+          frame: 0,
+        };
+
+        function animateIntroReveal() {
+          introReveal.frame = 0;
+          introReveal.x += (introReveal.targetX - introReveal.x) * 0.2;
+          introReveal.y += (introReveal.targetY - introReveal.y) * 0.2;
+          introGate.style.setProperty("--intro-reveal-x", `${introReveal.x}%`);
+          introGate.style.setProperty("--intro-reveal-y", `${introReveal.y}%`);
+
+          if (Math.abs(introReveal.targetX - introReveal.x) > 0.04 || Math.abs(introReveal.targetY - introReveal.y) > 0.04) {
+            introReveal.frame = window.requestAnimationFrame(animateIntroReveal);
+          }
+        }
+
+        function moveIntroReveal(event) {
+          const bounds = introGate.getBoundingClientRect();
+          introReveal.targetX = Math.max(0, Math.min(100, ((event.clientX - bounds.left) / bounds.width) * 100));
+          introReveal.targetY = Math.max(0, Math.min(100, ((event.clientY - bounds.top) / bounds.height) * 100));
+
+          if (introMotionPreference.matches) {
+            introReveal.x = introReveal.targetX;
+            introReveal.y = introReveal.targetY;
+            introGate.style.setProperty("--intro-reveal-x", `${introReveal.x}%`);
+            introGate.style.setProperty("--intro-reveal-y", `${introReveal.y}%`);
+          } else if (!introReveal.frame) {
+            introReveal.frame = window.requestAnimationFrame(animateIntroReveal);
+          }
+        }
+
+        introGate.addEventListener("pointermove", moveIntroReveal, { passive: true });
+        introGate.addEventListener("pointerdown", moveIntroReveal, { passive: true });
+
+        const introGateLink = introGate.querySelector(".intro-gate-link");
+        if (introGateLink) {
+          introGateLink.addEventListener("click", () => {
+            introGate.classList.add("is-leaving");
+            introGate.inert = true;
+          });
+        }
+      }
 
       const glitterCanvas = document.querySelector(".ambient-glitter");
       const glitterContext = glitterCanvas.getContext("2d");
@@ -110,12 +360,12 @@
             : 0.38 + (Math.sin(time * particle.twinkleSpeed + particle.phase) + 1) * 0.31;
           const alpha = particle.opacity * twinkle;
           glitterContext.beginPath();
-          glitterContext.fillStyle = `rgba(198, 255, 248, ${alpha})`;
+          glitterContext.fillStyle = `rgba(210, 229, 255, ${alpha})`;
           glitterContext.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
           glitterContext.fill();
 
           if (particle.radius > 1) {
-            glitterContext.strokeStyle = `rgba(218, 255, 251, ${alpha * 0.55})`;
+            glitterContext.strokeStyle = `rgba(226, 238, 255, ${alpha * 0.55})`;
             glitterContext.lineWidth = 0.55;
             glitterContext.beginPath();
             glitterContext.moveTo(particle.x - particle.radius * 1.8, particle.y);
@@ -195,50 +445,107 @@
         document.querySelector("#edideliver-project-dialog").close();
       });
 
-      const skillCategories = document.querySelectorAll(".skill-category");
-      const skillLaptop = document.querySelector(".skill-laptop");
-      const laptopScreen = document.querySelector(".laptop-screen");
-      const skillScreenFront = document.querySelector(".skill-screen-front");
-      const skillScreenBack = document.querySelector(".skill-screen-back");
-      const skillContextTitle = document.querySelector(".skill-context-title");
-      const skillTags = document.querySelector(".skill-screen-back .stack-tags");
+      const skillLiquidField = document.querySelector(".skill-liquid-field");
+      const skillOrbList = document.querySelector(".skill-orb-list");
+      const skillCategories = document.querySelectorAll(".skill-orb");
+      const skillDetail = document.querySelector("#skill-detail");
+      const skillDetailTitle = document.querySelector("#skill-detail-title");
+      const skillBubbles = document.querySelector(".skill-bubbles");
+      const skillResetButton = document.querySelector(".skill-reset");
+      const skillScrollLayer = document.querySelector(".skill-scroll-layer");
+      const skillMotionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const skillScrollMotion = {
+        x: 0,
+        targetX: 0,
+        previousScrollY: window.scrollY,
+        direction: 0,
+        frame: 0,
+      };
 
-      function showCategoryFront() {
-        skillLaptop.classList.remove("is-showing-skills");
-        skillScreenFront.inert = false;
-        skillScreenFront.setAttribute("aria-hidden", "false");
-        skillScreenBack.inert = true;
-        skillScreenBack.setAttribute("aria-hidden", "true");
+      function animateSkillScroll() {
+        skillScrollMotion.frame = 0;
+        skillScrollMotion.x += (skillScrollMotion.targetX - skillScrollMotion.x) * 0.14;
+        skillScrollLayer.style.transform = `translate3d(${skillScrollMotion.x}px, 0, 0)`;
+
+        if (Math.abs(skillScrollMotion.targetX - skillScrollMotion.x) > 0.08) {
+          skillScrollMotion.frame = window.requestAnimationFrame(animateSkillScroll);
+        }
       }
 
-      laptopScreen.addEventListener("click", (event) => {
-        if (event.target.closest(".skill-category, .stack-tag")) return;
-        showCategoryFront();
+      function updateSkillScrollTarget() {
+        const currentScrollY = window.scrollY;
+        const scrollDirection = Math.sign(currentScrollY - skillScrollMotion.previousScrollY);
+        skillScrollMotion.previousScrollY = currentScrollY;
+        if (scrollDirection) {
+          skillScrollMotion.direction = scrollDirection;
+        }
+        if (skillMotionPreference.matches || !skillScrollMotion.direction) return;
+
+        const motionScale = window.innerWidth <= 600 ? 0.35 : 1;
+        skillScrollMotion.targetX = skillScrollMotion.direction > 0 ? -24 * motionScale : 24 * motionScale;
+        if (!skillScrollMotion.frame) {
+          skillScrollMotion.frame = window.requestAnimationFrame(animateSkillScroll);
+        }
+      }
+
+      function resetSkillScrollMotion() {
+        window.cancelAnimationFrame(skillScrollMotion.frame);
+        skillScrollMotion.frame = 0;
+        skillScrollMotion.x = 0;
+        skillScrollMotion.targetX = 0;
+        skillScrollMotion.previousScrollY = window.scrollY;
+        skillScrollMotion.direction = 0;
+        skillScrollLayer.style.transform = "none";
+      }
+
+      window.addEventListener("scroll", updateSkillScrollTarget, { passive: true });
+      window.addEventListener("resize", updateSkillScrollTarget, { passive: true });
+      skillMotionPreference.addEventListener("change", () => {
+        if (skillMotionPreference.matches) {
+          resetSkillScrollMotion();
+        } else {
+          updateSkillScrollTarget();
+        }
       });
+      updateSkillScrollTarget();
+
+      function showSkillCategories() {
+        skillLiquidField.classList.remove("has-selection");
+        skillOrbList.classList.remove("has-selection");
+        skillDetail.hidden = true;
+        skillBubbles.replaceChildren();
+        skillCategories.forEach((category) => {
+          category.classList.remove("is-selected");
+          category.setAttribute("aria-expanded", "false");
+        });
+      }
 
       skillCategories.forEach((category) => {
         category.addEventListener("click", () => {
-          skillContextTitle.textContent = category.dataset.title;
-          skillTags.replaceChildren();
+          skillDetailTitle.textContent = category.dataset.title;
+          skillBubbles.replaceChildren();
           category.dataset.skills.split("|").forEach((skill) => {
-            const tag = document.createElement("span");
-            tag.className = "stack-tag";
-            tag.textContent = skill;
-            skillTags.append(tag);
+            const bubble = document.createElement("span");
+            bubble.className = "skill-bubble";
+            bubble.textContent = skill;
+            skillBubbles.append(bubble);
           });
-          skillScreenFront.inert = true;
-          skillScreenFront.setAttribute("aria-hidden", "true");
-          skillScreenBack.inert = false;
-          skillScreenBack.setAttribute("aria-hidden", "false");
-          skillLaptop.classList.add("is-showing-skills");
+          skillCategories.forEach((item) => {
+            const selected = item === category;
+            item.classList.toggle("is-selected", selected);
+            item.setAttribute("aria-expanded", String(selected));
+          });
+          skillOrbList.classList.add("has-selection");
+          skillLiquidField.classList.add("has-selection");
+          skillDetail.hidden = false;
         });
       });
 
-      document.querySelector(".skill-screen-back-button").addEventListener("click", showCategoryFront);
+      skillResetButton.addEventListener("click", showSkillCategories);
 
       function observeScrollReveals(root = document) {
         const elements = root.querySelectorAll(
-          ".section-heading, .project-card, .about-grid > div, .timeline-item, .contact-card, .profile-card",
+          ".section-heading, .about-grid > div, .timeline-item, .contact-card, .contact-showcase, .contact-social-card, .profile-card",
         );
         elements.forEach((element, index) => {
           if (element.classList.contains("scroll-reveal")) return;
@@ -253,6 +560,60 @@
       }
 
       observeScrollReveals();
+
+      const siteHeader = document.querySelector(".site-header");
+      let headerAnimationTimer = 0;
+      function scheduleHeaderTextAnimation() {
+        if (siteHeader.classList.contains("is-scroll-animating")) return;
+        siteHeader.classList.add("is-scroll-animating");
+        window.clearTimeout(headerAnimationTimer);
+        headerAnimationTimer = window.setTimeout(() => {
+          siteHeader.classList.remove("is-scroll-animating");
+        }, 560);
+      }
+
+      function handleHeaderScroll() {
+        if (!siteHeader) return;
+        if (window.scrollY > 28) {
+          siteHeader.classList.add("is-scrolled");
+          scheduleHeaderTextAnimation();
+        } else {
+          siteHeader.classList.remove("is-scrolled");
+          siteHeader.classList.remove("is-scroll-animating");
+          window.clearTimeout(headerAnimationTimer);
+        }
+      }
+      window.addEventListener("scroll", handleHeaderScroll, { passive: true });
+      handleHeaderScroll();
+
+      const navSectionLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+      const sectionTargets = Array.from(navSectionLinks)
+        .map((link) => {
+          const id = link.getAttribute("href");
+          const target = document.querySelector(id);
+          return target ? { link, target } : null;
+        })
+        .filter(Boolean);
+
+      function updateActiveNav() {
+        const scrollPos = window.scrollY + 140;
+        let activeFound = false;
+        for (let i = sectionTargets.length - 1; i >= 0; i--) {
+          const { link, target } = sectionTargets[i];
+          const top = target.offsetTop;
+          if (scrollPos >= top && !activeFound) {
+            link.classList.add("is-active");
+            activeFound = true;
+          } else {
+            link.classList.remove("is-active");
+          }
+        }
+        if (!activeFound && sectionTargets.length > 0) {
+          sectionTargets[0].link.classList.add("is-active");
+        }
+      }
+      window.addEventListener("scroll", updateActiveNav, { passive: true });
+      updateActiveNav();
 
       function setText(selector, value) {
         const element = document.querySelector(selector);
@@ -294,7 +655,6 @@
 
         if (profile.bio) {
           setText("#hero-copy", profile.bio);
-          setText("#about-copy", profile.bio);
         }
 
         if (profile.location) {
@@ -307,7 +667,7 @@
           document.querySelector("#company-row").hidden = false;
         }
 
-        for (const selector of ["#nav-github", "#hero-github", "#footer-github"]) {
+        for (const selector of ["#footer-github"]) {
           setProfileLink(document.querySelector(selector), profile.html_url);
         }
       }
@@ -320,6 +680,22 @@
         link.rel = "noreferrer";
         link.setAttribute("aria-label", `View ${repo.name} on GitHub`);
 
+        const cover = document.createElement("div");
+        cover.className = "project-cover project-generated-cover";
+        cover.setAttribute("aria-hidden", "true");
+        const coverType = document.createElement("span");
+        coverType.className = "project-generated-kicker";
+        coverType.textContent = "GITHUB PROJECT";
+        const coverName = document.createElement("span");
+        coverName.className = "project-generated-title";
+        coverName.textContent = repo.name;
+        const coverLanguage = document.createElement("span");
+        coverLanguage.className = "project-generated-language";
+        coverLanguage.textContent = repo.language || "OPEN SOURCE";
+        cover.append(coverType, coverName, coverLanguage);
+
+        const content = document.createElement("div");
+        content.className = "project-card-content";
         const top = document.createElement("div");
         top.className = "project-topline";
         const folder = document.createElement("span");
@@ -354,24 +730,22 @@
         description.textContent = repo.description || "A project in progress. Explore the repository to learn more.";
 
         const bottom = document.createElement("div");
-        bottom.className = "project-bottom";
-        const language = document.createElement("span");
-        language.className = "project-language";
-        if (repo.language) {
-          const dot = document.createElement("span");
-          dot.className = "language-dot";
-          dot.setAttribute("aria-hidden", "true");
-          language.append(dot, document.createTextNode(repo.language));
-        } else {
-          language.textContent = "Open source";
-        }
-
-        const arrow = document.createElement("span");
-        arrow.className = "project-arrow";
-        arrow.textContent = "↗";
-        arrow.setAttribute("aria-hidden", "true");
-        bottom.append(language, arrow);
-        link.append(top, title, description, bottom);
+        bottom.className = "project-meta";
+        const projectTechnology = document.createElement("span");
+        const technologyLabel = document.createElement("strong");
+        technologyLabel.textContent = "Tech: ";
+        projectTechnology.append(technologyLabel);
+        projectTechnology.append(document.createTextNode(repo.language || "Open-source project"));
+        const projectRole = document.createElement("span");
+        const roleLabel = document.createElement("strong");
+        roleLabel.textContent = "Role: ";
+        projectRole.append(roleLabel, document.createTextNode("Public GitHub repository."));
+        const repositoryAction = document.createElement("span");
+        repositoryAction.className = "lan-project-open";
+        repositoryAction.textContent = "View repository ↗";
+        bottom.append(projectTechnology, projectRole, repositoryAction);
+        content.append(top, title, description, bottom);
+        link.append(cover, content);
         link.style.setProperty("--project-index", index);
         return link;
       }
@@ -391,11 +765,13 @@
         projectGrid.setAttribute("aria-busy", "false");
 
         if (publicRepos.length === 0) {
-          loadStatus.textContent = "No public projects were found.";
+          loadStatus.textContent = "No additional public GitHub projects were found.";
         } else {
           publicRepos.forEach((repo, index) => projectGrid.append(makeProjectCard(repo, index)));
           loadStatus.textContent = `${publicRepos.length} GitHub projects loaded.`;
         }
+        syncProjectCarousel();
+        updatePortfolioCounts();
         observeScrollReveals(projectGrid);
 
       }
@@ -417,6 +793,8 @@
         link.textContent = " View repositories ↗";
         message.append(link);
         projectGrid.replaceChildren(loadStatus, ...featuredProjects, message);
+        syncProjectCarousel();
+        updatePortfolioCounts();
         observeScrollReveals(projectGrid);
         loadStatus.textContent = "Projects could not be loaded from GitHub.";
       }
