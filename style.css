@@ -209,6 +209,7 @@
         min-height: 50px;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
         padding: 0 22px;
         border: 1px solid color-mix(in srgb, var(--accent-light) 62%, transparent);
         border-radius: 3px;
@@ -3299,7 +3300,7 @@
 
         .lanyard-rig {
           max-width: 380px;
-          margin-          top: 10px;
+          margin-top: 10px;
         }
 
         h1 {
@@ -3342,6 +3343,10 @@
 
         .intro-gate-image {
           transform: translateX(12px);
+        }
+
+        .intro-gate.is-leaving .intro-gate-image {
+          opacity: 0;
         }
 
         .intro-gate-welcome {
@@ -3409,10 +3414,12 @@
         .intro-portrait {
           width: min(108vw, 440px);
           height: 75vh;
+          filter: brightness(0.72) saturate(0.88) drop-shadow(0 18px 64px rgb(88 150 218 / 24%));
+          opacity: 0.95;
         }
 
         .intro-slide::after {
-          background-size: auto 75vh;
+          display: none;
         }
 
         .lanyard-straps-wrap {
@@ -3559,6 +3566,7 @@
 
         .project-card .project-description {
           margin-bottom: 10px;
+          line-clamp: 2;
           -webkit-line-clamp: 2;
         }
 
@@ -3626,6 +3634,10 @@
           transition-duration: 0.01ms !important;
           animation-duration: 0.01ms !important;
           animation-iteration-count: 1 !important;
+        }
+
+        .intro-marquee-track {
+          animation: intro-name-marquee 18s linear infinite !important;
         }
       }
     
